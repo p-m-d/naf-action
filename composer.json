@@ -1,0 +1,24 @@
+{
+	"name": "p-m-d/naf-action",
+	"description": "Naf Action",
+	"homepage": "https://github.com/p-m-d/naf-action",
+	"type": "library",
+	"license": "None",
+	"require": {
+		"php": ">=5.4.0",
+		"p-m-d/sli": "dev-master"
+	},
+	"require-dev": {
+		"phpunit/phpunit": "^4.6"
+	},
+	"autoload": {
+		"psr-4": {
+			"Naf\\Action\\": "src"
+		}
+	},
+	"autoload-dev": {
+		"psr-4": {
+			"Naf\\Action\\Test\\": "tests"
+		}
+	}
+}
