@@ -3,6 +3,7 @@
 namespace Naf\Action;
 
 use Naf\App;
+use Naf\Config;
 use Infiltrate\FilterableStaticTrait;
 
 class Action {
@@ -43,6 +44,19 @@ class Action {
 
 	protected static $_dispatchFilters = [];
 
+	public static function bootstrap() {
+		$namespace = 'Naf\\Action';
+		$provides = [
+			'controller' => ['Controller', 'Action'],
+			'view' => ['View', 'Action']
+		];
+		$params = compact('namespace', 'provides');
+		return static::_filter(__FUNCTION__, $params, function($self, $params){
+			extract($params);
+			App::provide($namespace, $provides);
+		});
+	}
+
 	public static function route($pattern, $route = [], $match = []) {
 		if (($router = static::$classes['router']) != __CLASS__) {
 			return $router::route($pattern, $route, static::$defaults);
@@ -71,7 +85,7 @@ class Action {
 
 	public static function dispatchFilter($pattern, $filter = []) {
 		if (($router = static::$classes['router']) != __CLASS__) {
-			return $router::connectFilter($pattern, $filter);
+			return $router::dispatchFilter($pattern, $filter);
 		}
 		if (is_array($pattern)) {
 			array_map(__METHOD__, array_keys($pattern), $pattern);
@@ -108,7 +122,7 @@ class Action {
 			foreach ($self::$_routes as $_route) {
 				$matches = false;
 				extract($_route);
-				$route = App::merge($route, ['params' => [], 'args' => []]);
+				$route = Config::merge($route, ['params' => [], 'args' => []]);
 				if (strpos($pattern, '#') === 0) {
 					if (preg_match($pattern, $request->url, $params)) {
 						array_map(function($v, $k) use(&$route){
@@ -152,10 +166,10 @@ class Action {
 				if (preg_match($pattern, $request->url, $params)) {
 					if (is_callable($filter)) {
 						if ($_filterParams = call_user_func($filter, $request, $filterParams)) {
-							$_filterParams = App::merge($filterParams, $filter);
+							$_filterParams = Config::merge($filterParams, $filter);
 						}
 					} else {
-						$filterParams = App::merge($filterParams, $filter);
+						$filterParams = Config::merge($filterParams, $filter);
 						array_map(function($v, $k) use(&$filterParams){
 							if (is_string($k)) {
 								$filterParams[$k] = $v;
@@ -164,12 +178,12 @@ class Action {
 					}
 				}
 			}
-			$request->params = App::merge($request->params, $filterParams);
+			$request->params = Config::merge($request->params, $filterParams);
 			if (!($routeParams = $self::match($request, $filterParams))) {
 				$message = 'Cannot route request';
 				throw new \Exception($message);
 			}
-			$request->params = App::merge($request->params, $routeParams);
+			$request->params = Config::merge($request->params, $routeParams);
 		});
 		return static::call($request);
 	}

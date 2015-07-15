@@ -3,6 +3,7 @@
 namespace Naf\Action;
 
 use Naf\App;
+use Naf\Config;
 use Infiltrate\FilterableInstanceTrait;
 
 class View {
@@ -21,13 +22,13 @@ class View {
 	];
 
 	public function __construct($request = null, $response = null, $options = array()) {
-		$this->viewConfig(App::merge(self::$view, static::$view, $options));
+		$this->viewConfig(Config::merge(self::$view, static::$view, $options));
 		$this->request = $request ?: Action::request();
 		$this->response = $response ?: Action::response();
-		if (isset($this->_view['type'])) {
-			$this->response->type = $this->_view['type'];
+		if (isset($this->viewConfig['type'])) {
+			$this->response->type = $this->viewConfig['type'];
 		} else {
-			$this->_view['type'] = $this->response->type;
+			$this->viewConfig['type'] = $this->response->type;
 		}
 	}
 
@@ -38,9 +39,9 @@ class View {
 				$this->viewData($options['data']);
 			}
 			unset($options['data']);
-			$this->_view = $options + $this->_view;
+			$this->viewConfig = $options + $this->viewConfig;
 		}
-		$options = $this->_view;
+		$options = $this->viewConfig;
 		$content = '';
 		if ($options['view']) {
 			$content = $this->view($options['view'], $options);
@@ -86,13 +87,13 @@ class View {
 		//@todo filter
 		$templates = (array)$template;
 		$rendered = '';
-		$options+= $this->_view;
+		$options+= $this->viewConfig;
 		if (!isset($options['data']['content'])) {
 			$options['data']['content'] = '';
 		}
 		while ($template = array_pop($templates)) {
 			$templateFile = $this->locate($type, $template, $options);
-			$rendered = $this->_parse($templateFile, $options);
+			$rendered = $this->parse($templateFile, $options);
 			$options['data']['content'].= $rendered;
 		}
 		return $rendered;
@@ -100,7 +101,7 @@ class View {
 
 	public function locate($type, $template, $options = []) {
 		//@todo filter
-		$paths = $this->_paths($type);
+		$paths = $this->paths($type);
 		foreach ($paths as $path) {
 			if (!empty($options["{$type}_path"])) {
 				$template = $options["{$type}_path"] . DS . $template;
@@ -122,7 +123,7 @@ class View {
 		throw new \Exception($message);
 	}
 
-	protected function _parse($__templateFile__, $options) {
+	protected function parse($__templateFile__, $options) {
 		//@todo filter
 		if (!empty($options['data'])) {
 			extract($options['data']);
@@ -132,7 +133,7 @@ class View {
 		return ob_get_clean();
 	}
 
-	protected function _paths($type = null) {
+	protected function paths($type = null) {
 		//@todo filter
 		$base = APP . 'Template' . DS;
 		$view = [$base];

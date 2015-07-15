@@ -3,11 +3,12 @@
 namespace Naf\Action;
 
 use Naf\App;
+use Naf\Config;
 
 class ErrorHandler extends \Errand\ErrorHandler {
 
 	public static function renderError(array $error) {
-		if (!App::config('debug')) {
+		if (!Config::get('debug')) {
 			return;
 		}
 		$view = App::locate('View', 'view');
@@ -25,7 +26,7 @@ class ErrorHandler extends \Errand\ErrorHandler {
 			return $self->render();
 		});
 		$view = [
-			'view' => App::config('debug') ? 'debug_exception' : 'error',
+			'view' => Config::get('debug') ? 'debug_exception' : 'error',
 			'view_path' => 'Error'
 		];
 		$data = compact('exception');

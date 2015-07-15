@@ -23,7 +23,7 @@ class Controller {
 		'rendered' => false
 	];
 
-	protected $__overloaded = array();
+	protected $overloaded = array();
 
 	public function __construct($request = null, $response = null, $name = null) {
 		$this->viewConfig(static::$view + self::$view);
@@ -52,8 +52,8 @@ class Controller {
 				$message = 'Cannot invoke private controller action';
 				throw new \Exception($message);
 			}
-			if (isset($this->__overloaded[$action])) {
-				$invoke = $this->__overloaded[$action];
+			if (isset($this->overloaded[$action])) {
+				$invoke = $this->overloaded[$action];
 				return $invoke($self) ?: $self->response;
 			}
 			if (!method_exists($self, $action)) {
@@ -61,7 +61,7 @@ class Controller {
 				throw new \Exception($message);
 			}
 			$return = $self->{$action}();
-			if (!is_string($return) && $this->_view['render']) {
+			if (!is_string($return) && $this->viewConfig['render']) {
 				$this->render();
 			}
 			return $return ?: $self->response;
@@ -72,16 +72,16 @@ class Controller {
 		$params = compact('action','invoke');
 		$this->_filter(__FUNCTION__, $params, function($self, $params){
 			extract($params);
-			$self->__overloaded[$action] = $invoke;
+			$self->overloaded[$action] = $invoke;
 		});
 	}
 
 	public function render($options = []) {
-		if ($this->_view['rendered']) {
+		if ($this->viewConfig['rendered']) {
 			return;
 		}
-		$this->_view['rendered'] = true;
-		$options = $options + $this->_view + [
+		$this->viewConfig['rendered'] = true;
+		$options = $options + $this->viewConfig + [
 			'view_path' => $this->name
 		];
 		$class = App::locate($options['class'], 'view');

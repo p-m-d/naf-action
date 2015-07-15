@@ -3,25 +3,25 @@ namespace Naf\Action;
 
 trait ViewConfigTrait {
 
-	protected $_view = [];
+	protected $viewConfig = [];
 
 	public function viewData($data) {
 		$this->viewConfig(compact('data'));
-		return $this->_view['data'];
+		return $this->viewConfig['data'];
 	}
 
 	public function viewConfig($options = []) {
 		if ($options) {
 			if (isset($options['data']) && is_array($options['data'])) {
-				if (!isset($this->_view['data'])) {
-					$this->_view['data'] = [];
+				if (!isset($this->viewConfig['data'])) {
+					$this->viewConfig['data'] = [];
 				}
-				$this->_view['data'] = $options['data'] + $this->_view['data'];
+				$this->viewConfig['data'] = $options['data'] + $this->viewConfig['data'];
 			}
 			unset($options['data']);
-			$this->_view = $options + $this->_view;
+			$this->viewConfig = $options + $this->viewConfig;
 		}
-		return $this->_view;
+		return $this->viewConfig;
 	}
 }
 
