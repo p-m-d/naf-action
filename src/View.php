@@ -71,6 +71,10 @@ class View {
 		return $this->url($file);
 	}
 
+	public function image($file) {
+		return $this->asset($file);
+	}
+
 	public function view($template, $options = []) {
 		return $this->render('view', $template, $options);
 	}
