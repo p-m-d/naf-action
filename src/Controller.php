@@ -103,7 +103,7 @@ class Controller {
 			}
 		}
 		$view = new $class($this->request, $this->response, $options);
-		$this->response->body($view());
+		$this->response->body($view->renderAll());
 	}
 
 	public function redirect($url, $status = 302, $exit = true) {

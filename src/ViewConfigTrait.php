@@ -3,7 +3,7 @@ namespace Naf\Action;
 
 trait ViewConfigTrait {
 
-	protected $viewConfig = [];
+	protected $viewConfig = ['data' =>[]];
 
 	public function viewData($data) {
 		$this->viewConfig(compact('data'));
@@ -23,6 +23,20 @@ trait ViewConfigTrait {
 		}
 		return $this->viewConfig;
 	}
+
+	public function set($option, $value = null) {
+		if (!is_array($option)) {
+			$option = [$option => $value];
+		}
+		$this->viewData($option);
+	}
+
+	public function get($option, $default = null) {
+        if (!isset($this->viewConfig['data'][$option])) {
+            return $default;
+        }
+        return $this->viewConfig['data'][$option];
+    }
 }
 
 ?>
