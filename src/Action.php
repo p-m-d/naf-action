@@ -184,6 +184,7 @@ class Action {
 				throw new \Exception($message);
 			}
 			$request->params = Config::merge($request->params, $routeParams);
+			$self::$requests[] = $request;
 		});
 		return static::call($request);
 	}
