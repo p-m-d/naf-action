@@ -2,6 +2,7 @@
 
 namespace Naf\Action;
 
+use Naf\Action\Action;
 use Naf\App;
 use Naf\Config;
 
@@ -16,7 +17,9 @@ class ErrorHandler extends \Errand\ErrorHandler {
 		$viewObj = new $view($request);
 		$data = compact('error');
 		$view_path = 'Error';
-		echo $viewObj->render('view', 'debug_error', compact('data', 'view_path'));
+		$type = $request->type ?: key(Action::$contentTypes);
+		$options = compact('data', 'view_path', 'type');
+		echo $viewObj->render('view', 'debug_error', $options);
 	}
 
 	public static function renderException(\Exception $exception) {
