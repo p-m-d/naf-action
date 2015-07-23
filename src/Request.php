@@ -59,11 +59,12 @@ class Request {
 			}
 		}
 		$bases = [
-			$request->env['SCRIPT_NAME'],
-			dirname($request->env['SCRIPT_NAME']),
-			$request->base
+			preg_quote($request->env['SCRIPT_NAME'], '/'),
+			preg_quote(dirname($request->env['SCRIPT_NAME']), '/'),
+			preg_quote($request->base, '/')
 		];
-		$request->url = trim(str_replace($bases, '', $url), '/');
+		$basePattern = implode('|', array_unique($bases));
+		$request->url = trim(preg_replace("/^({$basePattern})/", '', $url), '/');
 	}
 
 	public static function parseContentTypes($request) {
