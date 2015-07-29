@@ -8,10 +8,20 @@ use Naf\Config;
 
 class ErrorHandler extends \Errand\ErrorHandler {
 
-	public static function renderError(array $error) {
+	protected static $staticMethodFilters = [
+		'handleError' => [
+			'\Naf\Action\ErrorHandler::renderError'
+		],
+		'handleException' => [
+			'\Naf\Action\ErrorHandler::renderException'
+		]
+	];
+
+	public static function renderError($self, $params, $chain) {
 		if (!Config::get('debug')) {
 			return;
 		}
+		extract($params);
 		$view = App::locate('View', 'view');
 		$request = end(Action::$requests) ?: Action::request();
 		$viewObj = new $view($request);
@@ -20,9 +30,11 @@ class ErrorHandler extends \Errand\ErrorHandler {
 		$type = $request->type ?: key(Action::$contentTypes);
 		$options = compact('data', 'view_path', 'type');
 		echo $viewObj->render('view', 'debug_error', $options);
+		return $chain->next($self, $params, $chain);
 	}
 
-	public static function renderException(\Exception $exception) {
+	public static function renderException($self, $params, $chain) {
+		extract($params);
 		$request = end(Action::$requests) ?: Action::request();
 		$errorController = new Controller($request);
 		$errorController->overload('error', function($self){
@@ -34,6 +46,7 @@ class ErrorHandler extends \Errand\ErrorHandler {
 		];
 		$data = compact('exception');
 		echo $errorController('error', $data, $view);
+		return $chain->next($self, $params, $chain);
 	}
 }
 
