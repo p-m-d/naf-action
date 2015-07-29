@@ -51,7 +51,7 @@ class Action {
 			'view' => ['View', 'Action']
 		];
 		$params = compact('namespace', 'provides');
-		return static::_filter(__FUNCTION__, $params, function($self, $params){
+		return static::filterStaticMethod(__FUNCTION__, $params, function($self, $params){
 			extract($params);
 			App::provide($namespace, $provides);
 		});
@@ -66,7 +66,7 @@ class Action {
 		} else {
 			$defaults = static::$defaults;
 			$params = compact('pattern', 'route', 'match', 'defaults');
-			static::_filter(__FUNCTION__, $params, function($self, $params) {
+			static::filterStaticMethod(__FUNCTION__, $params, function($self, $params) {
 				$route = $params['defaults'];
 				if (!is_array($params['route'])) {
 					if (is_string($params['route'])) {
@@ -91,7 +91,7 @@ class Action {
 			array_map(__METHOD__, array_keys($pattern), $pattern);
 		} else {
 			$params = compact('pattern', 'filter');
-			static::_filter(__FUNCTION__, $params, function($self, $params) {
+			static::filterStaticMethod(__FUNCTION__, $params, function($self, $params) {
 				static::$_dispatchFilters[$params['pattern']] = $params['filter'];
 			});
 		}
@@ -117,7 +117,7 @@ class Action {
 			return $router::match($request);
 		}
 		$params = compact('request');
-		return static::_filter(__FUNCTION__, $params, function($self, $params){
+		return static::filterStaticMethod(__FUNCTION__, $params, function($self, $params){
 			extract($params);
 			foreach ($self::$_routes as $_route) {
 				$matches = false;
@@ -159,7 +159,7 @@ class Action {
 
 	public static function dispatch() {
 		$request = static::request();
-		static::_filter(__FUNCTION__, compact('request'), function($self, $params){
+		static::filterStaticMethod(__FUNCTION__, compact('request'), function($self, $params){
 			extract($params);
 			$filterParams = [];
 			foreach ($self::$_dispatchFilters as $pattern => $filter) {
@@ -192,7 +192,7 @@ class Action {
 	public static function call($request) {
 		$response = static::response();
 		$params = compact('request', 'response');
-		return static::_filter(__FUNCTION__, $params, function($self, $params){
+		return static::filterStaticMethod(__FUNCTION__, $params, function($self, $params){
 			extract($params);
 			if (isset($request->params['call'])) {
 				$invoke = $request->params['call'];
@@ -220,7 +220,7 @@ class Action {
 	public static function request() {
 		$class = static::$classes['request'];
 		$params = compact('class');
-		return static::_filter(__FUNCTION__, $params, function($self, $params){
+		return static::filterStaticMethod(__FUNCTION__, $params, function($self, $params){
 			extract($params);
 			return new $class();
 		});
@@ -229,7 +229,7 @@ class Action {
 	public static function response() {
 		$class = static::$classes['response'];
 		$params = compact('class');
-		return static::_filter(__FUNCTION__, $params, function($self, $params){
+		return static::filterStaticMethod(__FUNCTION__, $params, function($self, $params){
 			extract($params);
 			return new $class();
 		});

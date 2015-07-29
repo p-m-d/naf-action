@@ -40,7 +40,7 @@ class Controller {
 
 	public function __invoke($action = null, $data = null, $view = null) {
 		$params = compact('action', 'data', 'view');
-		return $this->_filter(__FUNCTION__, $params, function($self, $params){
+		return $this->filterMethod(__FUNCTION__, $params, function($self, $params){
 			$action = $params['action'] ?: $self->request->params['action'];
 			if ($params['data']) {
 				$self->viewData($params['data']);
@@ -70,7 +70,7 @@ class Controller {
 
 	public function overload($action, $invoke) {
 		$params = compact('action','invoke');
-		$this->_filter(__FUNCTION__, $params, function($self, $params){
+		$this->filterMethod(__FUNCTION__, $params, function($self, $params){
 			extract($params);
 			$self->overloaded[$action] = $invoke;
 		});
