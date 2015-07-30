@@ -8,16 +8,12 @@ use Naf\Config;
 
 class ErrorHandler extends \Errand\ErrorHandler {
 
-	protected $methodFilters = [
-		'handleError' => [
-			'\Naf\Action\ErrorHandler::renderError'
-		],
-		'handleException' => [
-			'\Naf\Action\ErrorHandler::renderException'
-		]
-	];
+	public function __construct() {
+		$this->addMethodFilter('handleError', [$this, 'renderError']);
+		$this->addMethodFilter('handleException', [$this, 'renderException']);
+	}
 
-	public static function renderError($self, $params, $chain) {
+	public function renderError($self, $params, $chain) {
 		if (!Config::get('debug')) {
 			return;
 		}
@@ -30,10 +26,11 @@ class ErrorHandler extends \Errand\ErrorHandler {
 		$type = $request->type ?: key(Action::$contentTypes);
 		$options = compact('data', 'view_path', 'type');
 		echo $viewObj->render('view', 'debug_error', $options);
+		$params['default'] = false;
 		return $chain->next($self, $params, $chain);
 	}
 
-	public static function renderException($self, $params, $chain) {
+	public function renderException($self, $params, $chain) {
 		extract($params);
 		$request = end(Action::$requests) ?: Action::request();
 		$errorController = new Controller($request);
@@ -46,6 +43,7 @@ class ErrorHandler extends \Errand\ErrorHandler {
 		];
 		$data = compact('exception');
 		echo $errorController('error', $data, $view);
+		$params['exit'] = true;
 		return $chain->next($self, $params, $chain);
 	}
 }
