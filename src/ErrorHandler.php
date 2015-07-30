@@ -8,7 +8,7 @@ use Naf\Config;
 
 class ErrorHandler extends \Errand\ErrorHandler {
 
-	protected static $staticMethodFilters = [
+	protected $methodFilters = [
 		'handleError' => [
 			'\Naf\Action\ErrorHandler::renderError'
 		],
