@@ -2,6 +2,8 @@
 
 namespace Naf\Action;
 
+use Naf\Action\Exception\ActionException;
+use Naf\Action\Exception\NotFoundException;
 use Naf\App;
 use Naf\Config;
 use Infiltrate\FilterableStaticTrait;
@@ -181,7 +183,7 @@ class Action {
 			$request->params = Config::merge($request->params, $filterParams);
 			if (!($routeParams = $self::match($request, $filterParams))) {
 				$message = 'Cannot route request';
-				throw new \Exception($message);
+				throw new NotFoundException($message);
 			}
 			$request->params = Config::merge($request->params, $routeParams);
 			$self::$requests[] = $request;
@@ -198,19 +200,19 @@ class Action {
 				$invoke = $request->params['call'];
 				if (!is_callable($invoke)) {
 					$message = 'Cannot invoke non-callable';
-					throw new \Exception($message);
+					throw new ActionException($message);
 				}
 				return $invoke($request, $response);
 			} else {
 				$controller = App::locate($request->params['controller'], 'controller');
 				if (!$controller) {
 					$message = 'Cannot locate controller';
-					throw new \Exception($message);
+					throw new NotFoundException($message);
 				}
 				$invoke = new $controller($request, $response);
 				if (!is_callable([$invoke, $request->params['action']])) {
 					$message = 'Cannot invoke non-callable controller action';
-					throw new \Exception($message);
+					throw new ActionException($message);
 				}
 				return $invoke();
 			}

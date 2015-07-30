@@ -2,6 +2,7 @@
 
 namespace Naf\Action;
 
+use Naf\Action\Exception\NotFoundException;
 use Naf\App;
 use Naf\Config;
 use Infiltrate\FilterableInstanceTrait;
@@ -259,7 +260,7 @@ class View {
 			}
 		}
 		$message = "Template file '{{$type}}/{$template}' not found";
-		throw new \Exception($message);
+		throw new NotFoundException($message);
 	}
 
 	protected function parse($__templateFile__, $options) {
@@ -282,7 +283,7 @@ class View {
 		if ($type) {
 			if (!isset($paths[$type])) {
 				$message = "Template path not defined for '{$type}'";
-				throw new \Exception($message);
+				throw new NotFoundException($message);
 			}
 			return $paths[$type];
 		}

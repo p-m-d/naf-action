@@ -3,6 +3,7 @@
 namespace Naf\Action;
 
 use Naf\Action\Action;
+use Naf\Action\Exception\ActionException;
 use Naf\App;
 use Naf\Config;
 
@@ -33,7 +34,13 @@ class ErrorHandler extends \Errand\ErrorHandler {
 	public function renderException($self, $params, $chain) {
 		extract($params);
 		$request = end(Action::$requests) ?: Action::request();
-		$errorController = new Controller($request);
+		$response = Action::response();
+		if (!Config::get('debug')) {
+			if ($exception instanceOf ActionException) {
+				$response->status = $exception->getStatus();
+			}
+		}
+		$errorController = new Controller($request, $response);
 		$errorController->overload('error', function($self){
 			return $self->render();
 		});
