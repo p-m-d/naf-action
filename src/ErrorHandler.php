@@ -10,8 +10,8 @@ use Naf\Config;
 class ErrorHandler extends \Errand\ErrorHandler {
 
 	public function __construct() {
-		$this->addMethodFilter('handleError', [$this, 'renderError']);
-		$this->addMethodFilter('handleException', [$this, 'renderException']);
+		$this->addErrorHandler([$this, 'renderError']);
+		$this->addExceptionHandler([$this, 'renderException']);
 	}
 
 	public function renderError($self, $params, $chain) {
