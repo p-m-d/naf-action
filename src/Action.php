@@ -141,8 +141,11 @@ class Action {
 				if ($matches && !empty($match)) {
 					$matches = static::_match($request, $route, $match);
 				}
-				return $matches ? $route : false;
+				if ($matches) {
+					return $route;
+				}
 			}
+			return false;
 		});
 	}
 
