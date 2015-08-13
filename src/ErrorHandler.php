@@ -32,6 +32,9 @@ class ErrorHandler extends \Errand\ErrorHandler {
 	}
 
 	public function renderException($self, $params, $chain) {
+		if (ob_get_length()) {
+			ob_end_clean();
+		}
 		extract($params);
 		$request = end(Action::$requests) ?: Action::request();
 		$response = Action::response();
